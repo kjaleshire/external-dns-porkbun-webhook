@@ -12,10 +12,11 @@ spec:
         app: nginx
     spec:
       containers:
-      - image: nginx
-        name: nginx
-        ports:
-        - containerPort: 80
+        - image: nginx
+          name: nginx
+          ports:
+            - containerPort: 80
+          resources: {}
 ---
 apiVersion: v1
 kind: Service

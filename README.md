@@ -95,23 +95,23 @@ spec:
         - --source=service
         - --provider=webhook
       - name: external-dns-webhook-provider
-        image: ghcr.io/mrueg/external-dns-netcup-webhook:latest
+        image: ghcr.io/mrueg/external-dns-porkbun-webhook:latest
         imagePullPolicy: Always
         args:
         - --log-level=debug
         - --domain-filter=YOUR_DOMAIN
-        - --netcup-customer-id=YOUR_ID
+        - --porkbun-customer-id=YOUR_ID
         env:
-        - name: NETCUP_API_KEY
+        - name: PORKBUN_API_KEY
           valueFrom:
             secretKeyRef:
-              key: NETCUP_API_KEY
-              name: netcup-api-key
-        - name: NETCUP_API_PASSWORD
+              key: PORKBUN_API_KEY
+              name: porkbun-api-key
+        - name: PORKBUN_API_PASSWORD
           valueFrom:
             secretKeyRef:
-              key: NETCUP_API_PASSWORD
-              name: netcup-api-password
+              key: PORKBUN_API_PASSWORD
+              name: porkbun-api-password
 
 ```
 
@@ -183,7 +183,7 @@ The records should show the external IP address of the service as the A record f
 
 ### Cleanup
 
-Now that we have verified that external-dns will automatically manage Netcup DNS records, we can delete the tutorial's example:
+Now that we have verified that external-dns will automatically manage Porkbun DNS records, we can delete the tutorial's example:
 
 ```
 $ kubectl delete -f example/nginx.yaml

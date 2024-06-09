@@ -15,7 +15,7 @@ import (
 	"sigs.k8s.io/external-dns/provider"
 )
 
-// PorkbunProvider is an implementation of Provider for Netcup DNS.
+// PorkbunProvider is an implementation of Provider for Porkbun DNS.
 type PorkbunProvider struct {
 	provider.BaseProvider
 	client       *pb.Client
@@ -24,20 +24,20 @@ type PorkbunProvider struct {
 	logger       log.Logger
 }
 
-// NetcupChange includes the changesets that need to be applied to the Netcup CCP API
-type NetcupChange struct {
+// PorkbunChange includes the changesets that need to be applied to the Porkbun CCP API
+type PorkbunChange struct {
 	Create    *[]pb.Record
 	UpdateNew *[]pb.Record
 	UpdateOld *[]pb.Record
 	Delete    *[]pb.Record
 }
 
-// NewPorkbunProvider creates a new provider including the netcup CCP API client
+// NewPorkbunProvider creates a new provider including the Porkbun CCP API client
 func NewPorkbunProvider(domainFilterList *[]string, apiKey string, apiSecret string, dryRun bool, logger log.Logger) (*PorkbunProvider, error) {
 	domainFilter := endpoint.NewDomainFilter(*domainFilterList)
 
 	if !domainFilter.IsConfigured() {
-		return nil, fmt.Errorf("netcup provider requires at least one configured domain in the domainFilter")
+		return nil, fmt.Errorf("Porkbun provider requires at least one configured domain in the domainFilter")
 	}
 
 	if apiKey == "" {
@@ -206,14 +206,14 @@ func (p *PorkbunProvider) ApplyChanges(ctx context.Context, changes *plan.Change
 		return nil
 	}
 
-	// Assemble changes per zone and prepare it for the Netcup API client
+	// Assemble changes per zone and prepare it for the Porkbun API client
 	for zoneName, c := range perZoneChanges {
 		// Gather records from API to extract the record ID which is necessary for updating/deleting the record
 		recs, err := p.client.RetrieveRecords(ctx, zoneName)
 		if err != nil {
 			_ = level.Error(p.logger).Log("msg", "unable to get DNS records for domain", "zone", zoneName, "error", err)
 		}
-		change := &NetcupChange{
+		change := &PorkbunChange{
 			Create:    convertToPorkbunRecord(&recs, c.Create, zoneName, false),
 			UpdateNew: convertToPorkbunRecord(&recs, c.UpdateNew, zoneName, false),
 			UpdateOld: convertToPorkbunRecord(&recs, c.UpdateOld, zoneName, true),
@@ -244,7 +244,7 @@ func (p *PorkbunProvider) ApplyChanges(ctx context.Context, changes *plan.Change
 	return nil
 }
 
-// convertToPorkbunRecord transforms a list of endpoints into a list of Netcup DNS Records
+// convertToPorkbunRecord transforms a list of endpoints into a list of Porkbun DNS Records
 // returns a pointer to a list of DNS Records
 func convertToPorkbunRecord(recs *[]pb.Record, endpoints []*endpoint.Endpoint, zoneName string, DeleteRecord bool) *[]pb.Record {
 	records := make([]pb.Record, len(endpoints))
@@ -269,7 +269,7 @@ func convertToPorkbunRecord(recs *[]pb.Record, endpoints []*endpoint.Endpoint, z
 	return &records
 }
 
-// getIDforRecord compares the endpoint with existing records to get the ID from Netcup to ensure it can be safely removed.
+// getIDforRecord compares the endpoint with existing records to get the ID from Porkbun to ensure it can be safely removed.
 // returns empty string if no match found
 func getIDforRecord(recordName string, target string, recordType string, recs *[]pb.Record) string {
 	for _, rec := range *recs {
@@ -293,7 +293,7 @@ func endpointZoneName(endpoint *endpoint.Endpoint, zones []string) (zone string)
 	return matchZoneName
 }
 
-// ensureLogin makes sure that we are logged in to Netcup API.
+// ensureLogin makes sure that we are logged in to Porkbun API.
 func (p *PorkbunProvider) ensureLogin(ctx context.Context) error {
 	_ = level.Debug(p.logger).Log("msg", "performing login to Porkbun API")
 	_, err := p.client.Ping(ctx)

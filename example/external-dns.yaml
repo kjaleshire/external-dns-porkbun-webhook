@@ -8,15 +8,15 @@ kind: ClusterRole
 metadata:
   name: external-dns
 rules:
-- apiGroups: [""]
-  resources: ["services","endpoints","pods"]
-  verbs: ["get","watch","list"]
-- apiGroups: ["extensions","networking.k8s.io"]
-  resources: ["ingresses"]
-  verbs: ["get","watch","list"]
-- apiGroups: [""]
-  resources: ["nodes"]
-  verbs: ["list", "watch"]
+  - apiGroups: [""]
+    resources: ["services", "endpoints", "pods"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: ["extensions", "networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -27,9 +27,9 @@ roleRef:
   kind: ClusterRole
   name: external-dns
 subjects:
-- kind: ServiceAccount
-  name: external-dns
-  namespace: default
+  - kind: ServiceAccount
+    name: external-dns
+    namespace: default
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -48,29 +48,30 @@ spec:
     spec:
       serviceAccountName: external-dns
       containers:
-      - name: external-dns
-        image: registry.k8s.io/external-dns/external-dns:v0.14.0
-        args:
-        - --log-level=debug
-        - --source=ingress
-        - --source=service
-        - --provider=webhook
-      - name: external-dns-webhook-provider
-        image: ghcr.io/mrueg/external-dns-netcup-webhook:latest
-        imagePullPolicy: Always
-        args:
-        - --log-level=debug
-        - --domain-filter=YOUR_DOMAIN
-        - --netcup-customer-id=YOUR_ID
-        env:
-        - name: NETCUP_API_KEY
-          valueFrom:
-            secretKeyRef:
-              key: NETCUP_API_KEY
-              name: netcup-api-key
-        - name: NETCUP_API_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              key: NETCUP_API_PASSWORD
-              name: netcup-api-password
-
+        - name: external-dns
+          image: registry.k8s.io/external-dns/external-dns:v0.14.0
+          args:
+            - --log-level=debug
+            - --source=ingress
+            - --source=service
+            - --provider=webhook
+          resources: {}
+        - name: external-dns-webhook-provider
+          image: ghcr.io/mrueg/external-dns-porkbun-webhook:latest
+          imagePullPolicy: Always
+          args:
+            - --log-level=debug
+            - --domain-filter=YOUR_DOMAIN
+            - --porkbun-customer-id=YOUR_ID
+          env:
+            - name: PORKBUN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: PORKBUN_API_KEY
+                  name: porkbun-api-key
+            - name: PORKBUN_API_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: PORKBUN_API_PASSWORD
+                  name: porkbun-api-password
+          resources: {}

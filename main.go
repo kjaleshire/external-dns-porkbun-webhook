@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/alecthomas/kingpin/v2"
-	porkbun "github.com/fcomuniz/external-dns-porkbun-webhook/provider"
+	porkbun "github.com/kjaleshire/external-dns-porkbun-webhook/provider"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	"github.com/oklog/run"
@@ -28,8 +28,8 @@ var (
 
 	domainFilter = kingpin.Flag("domain-filter", "Limit possible target zones by a domain suffix; specify multiple times for multiple domains").Required().Envar("PORKBUN_DOMAIN_FILTER").Strings()
 	dryRun       = kingpin.Flag("dry-run", "Run without connecting to Porkbun's CCP API").Default("false").Envar("PORKBUN_DRY_RUN").Bool()
-	apiKey       = kingpin.Flag("porkbun-api-key", "The api key to connect to Netcup's CCP API").Required().Envar("PORKBUN_API_KEY").String()
-	apiSecret    = kingpin.Flag("porkbun-api-secret", "The api password to connect to Netcup's CCP API").Required().Envar("PORKBUN_API_PASSWORD").String()
+	apiKey       = kingpin.Flag("porkbun-api-key", "The api key to connect to Porkbun's CCP API").Required().Envar("PORKBUN_API_KEY").String()
+	apiSecret    = kingpin.Flag("porkbun-api-secret", "The api password to connect to Porkbun's CCP API").Required().Envar("PORKBUN_API_PASSWORD").String()
 )
 
 func main() {
