@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/alecthomas/kingpin/v2"
-	porkbun "github.com/kjaleshire/external-dns-porkbun-webhook/provider"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
+	porkbun "github.com/kjaleshire/external-dns-porkbun-webhook/provider"
 	"github.com/oklog/run"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -27,9 +27,9 @@ var (
 	tlsConfig         = kingpin.Flag("tls-config", "Path to TLS config file.").Envar("PORKBUN_TLS_CONFIG").Default("").String()
 
 	domainFilter = kingpin.Flag("domain-filter", "Limit possible target zones by a domain suffix; specify multiple times for multiple domains").Required().Envar("PORKBUN_DOMAIN_FILTER").Strings()
-	dryRun       = kingpin.Flag("dry-run", "Run without connecting to Porkbun's CCP API").Default("false").Envar("PORKBUN_DRY_RUN").Bool()
-	apiKey       = kingpin.Flag("porkbun-api-key", "The api key to connect to Porkbun's CCP API").Required().Envar("PORKBUN_API_KEY").String()
-	apiSecret    = kingpin.Flag("porkbun-api-secret", "The api password to connect to Porkbun's CCP API").Required().Envar("PORKBUN_API_PASSWORD").String()
+	dryRun       = kingpin.Flag("dry-run", "Run without connecting to Porkbun's API").Default("false").Envar("PORKBUN_DRY_RUN").Bool()
+	apiKey       = kingpin.Flag("porkbun-api-key", "The API key to connect to Porkbun's API").Required().Envar("PORKBUN_API_KEY").String()
+	apiSecret    = kingpin.Flag("porkbun-secret-key", "The API secret to connect to Porkbun's API").Required().Envar("PORKBUN_SECRET_KEY").String()
 )
 
 func main() {

@@ -107,11 +107,11 @@ spec:
             secretKeyRef:
               key: PORKBUN_API_KEY
               name: porkbun-api-key
-        - name: PORKBUN_API_PASSWORD
+        - name: PORKBUN_SECRET_KEY
           valueFrom:
             secretKeyRef:
-              key: PORKBUN_API_PASSWORD
-              name: porkbun-api-password
+              key: PORKBUN_SECRET_KEY
+              name: porkbun-secret-key
 
 ```
 
