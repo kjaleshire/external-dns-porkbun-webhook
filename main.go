@@ -115,6 +115,7 @@ func main() {
 func buildMetricsServer(registry prometheus.Gatherer, logger log.Logger) *http.ServeMux {
 	mux := http.NewServeMux()
 
+	var healthzPath = "/healthz"
 	var metricsPath = "/metrics"
 	var rootPath = "/"
 
@@ -124,6 +125,12 @@ func buildMetricsServer(registry prometheus.Gatherer, logger log.Logger) *http.S
 		promhttp.HandlerOpts{
 			EnableOpenMetrics: true,
 		}))
+
+	// Add healthzPath
+	mux.HandleFunc(healthzPath, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(http.StatusText(http.StatusOK)))
+	})
 
 	// Add index
 	landingConfig := web.LandingConfig{
@@ -150,7 +157,6 @@ func buildWebhookServer(logger log.Logger) (*http.ServeMux, error) {
 	mux := http.NewServeMux()
 
 	var rootPath = "/"
-	var healthzPath = "/healthz"
 	var recordsPath = "/records"
 	var adjustEndpointsPath = "/adjustendpoints"
 
@@ -162,12 +168,6 @@ func buildWebhookServer(logger log.Logger) (*http.ServeMux, error) {
 	p := webhook.WebhookServer{
 		Provider: ncProvider,
 	}
-
-	// Add healthzPath
-	mux.HandleFunc(healthzPath, func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(http.StatusText(http.StatusOK)))
-	})
 
 	// Add negotiatePath
 	mux.HandleFunc(rootPath, p.NegotiateHandler)
