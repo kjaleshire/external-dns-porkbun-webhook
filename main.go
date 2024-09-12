@@ -23,7 +23,7 @@ var (
 	logFormat         = kingpin.Flag("log-format", "The format in which log messages are printed (default: text, options: logfmt, json)").Default("logfmt").Envar("PORKBUN_LOG_FORMAT").String()
 	logLevel          = kingpin.Flag("log-level", "Set the level of logging. (default: info, options: panic, debug, info, warning, error, fatal)").Default("info").Envar("PORKBUN_LOG_LEVEL").String()
 	listenAddr        = kingpin.Flag("listen-address", "The address this plugin listens on").Default(":8888").Envar("PORKBUN_LISTEN_ADDRESS").String()
-	metricsListenAddr = kingpin.Flag("metrics-listen-address", "The address this plugin provides metrics on").Default(":8889").Envar("PORKBUN_METRICS_LISTEN_ADDRESS").String()
+	metricsListenAddr = kingpin.Flag("metrics-listen-address", "The address this plugin provides metrics on").Default(":8080").Envar("PORKBUN_METRICS_LISTEN_ADDRESS").String()
 	tlsConfig         = kingpin.Flag("tls-config", "Path to TLS config file.").Envar("PORKBUN_TLS_CONFIG").Default("").String()
 
 	domainFilter = kingpin.Flag("domain-filter", "Limit possible target zones by a domain suffix; specify multiple times for multiple domains").Required().Envar("PORKBUN_DOMAIN_FILTER").Strings()
@@ -117,7 +117,13 @@ func buildMetricsServer(registry prometheus.Gatherer, logger log.Logger) *http.S
 
 	var healthzPath = "/healthz"
 	var metricsPath = "/metrics"
-	var rootPath = "/"
+	// var rootPath = "/"
+
+	// Add healthzPath
+	mux.HandleFunc(healthzPath, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(http.StatusText(http.StatusOK)))
+	})
 
 	// Add metricsPath
 	mux.Handle(metricsPath, promhttp.HandlerFor(
@@ -126,29 +132,23 @@ func buildMetricsServer(registry prometheus.Gatherer, logger log.Logger) *http.S
 			EnableOpenMetrics: true,
 		}))
 
-	// Add healthzPath
-	mux.HandleFunc(healthzPath, func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(http.StatusText(http.StatusOK)))
-	})
-
 	// Add index
-	landingConfig := web.LandingConfig{
-		Name:        "external-dns-porkbun-webhook",
-		Description: "external-dns webhook provider for Porkbun",
-		Version:     version.Info(),
-		Links: []web.LandingLinks{
-			{
-				Address: metricsPath,
-				Text:    "Metrics",
-			},
-		},
-	}
-	landingPage, err := web.NewLandingPage(landingConfig)
-	if err != nil {
-		_ = level.Error(logger).Log("msg", "failed to create landing page", "error", err)
-	}
-	mux.Handle(rootPath, landingPage)
+	// landingConfig := web.LandingConfig{
+	// 	Name:        "external-dns-porkbun-webhook",
+	// 	Description: "external-dns webhook provider for Porkbun",
+	// 	Version:     version.Info(),
+	// 	Links: []web.LandingLinks{
+	// 		{
+	// 			Address: metricsPath,
+	// 			Text:    "Metrics",
+	// 		},
+	// 	},
+	// }
+	// landingPage, err := web.NewLandingPage(landingConfig)
+	// if err != nil {
+	// 	_ = level.Error(logger).Log("msg", "failed to create landing page", "error", err)
+	// }
+	// mux.Handle(rootPath, landingPage)
 
 	return mux
 }
