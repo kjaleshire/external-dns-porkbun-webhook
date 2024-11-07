@@ -5,7 +5,7 @@ go 1.23
 require (
 	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/go-kit/log v0.2.1
-	github.com/nrdcg/porkbun v0.3.0
+	github.com/nrdcg/porkbun v0.4.0
 	github.com/oklog/run v1.1.0
 	github.com/prometheus/client_golang v1.18.0
 	github.com/prometheus/common v0.46.0
